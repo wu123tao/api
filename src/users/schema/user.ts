@@ -5,15 +5,15 @@ import { IsNotEmpty } from 'class-validator';
  * 创建用户参数
  */
 export class CreateUserDto {
-  @ApiProperty({ description: '账号', example: 'admin' })
+  @ApiProperty({ description: '账号', example: '' })
   @IsNotEmpty({ message: '请填写账号' })
   account: string;
 
-  @ApiProperty({ description: '用户名', example: '超级管理员' })
+  @ApiProperty({ description: '用户名', example: '' })
   @IsNotEmpty({ message: '请填写用户名' })
   userName: string;
 
-  @ApiProperty({ description: '密码', example: '123456' })
+  @ApiProperty({ description: '密码', example: '' })
   @IsNotEmpty({ message: '请填写密码' })
   password: string;
 }
@@ -22,16 +22,14 @@ export class CreateUserDto {
  * 创建用户参数
  */
 export class EditUserDto {
-  @ApiProperty({ description: 'id', example: 'admin' })
+  @ApiProperty({ description: 'id', example: '' })
   @IsNotEmpty({ message: '请填写id' })
   id: string;
 
-  @ApiProperty({ description: '账号', example: 'admin' })
-  @IsNotEmpty({ message: '请填写账号' })
+  @ApiProperty({ description: '账号', example: '' })
   account: string;
 
-  @ApiProperty({ description: '用户名', example: '超级管理员' })
-  @IsNotEmpty({ message: '请填写用户名' })
+  @ApiProperty({ description: '用户名', example: '' })
   userName: string;
 }
 
