@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { User } from './db/user.model';
 import { ReturnModelType } from '@typegoose/typegoose';
@@ -21,15 +21,13 @@ export class UsersService {
     const userinfo = await this.userModel.findOne({ account: account });
 
     if (userinfo && userinfo.id) {
-      return {
-        error: '该账号已存在',
-      };
+      throw new HttpException('该账号已存在', HttpStatus.NOT_ACCEPTABLE);
     }
     const md5Password = md5(password);
     const createLoginInfo = { ...createUserDto, password: md5Password };
-    const res = await this.userModel.create(createLoginInfo);
+    await this.userModel.create(createLoginInfo);
 
-    return { success: res };
+    return true;
   }
 
   async getInfoById(id: string) {
@@ -42,26 +40,23 @@ export class UsersService {
       const userInfo = await this.userModel.findById(editUserDto.id);
 
       await this.userModel.findByIdAndUpdate(userInfo.id, editUserDto);
-      return { code: 200, message: '操作成功', data: null };
+      return true;
     } catch (error) {
-      return {
-        code: 500,
-        message: '用户不存在',
-        data: null,
-      };
+      throw new HttpException('编辑用户失败', HttpStatus.NOT_ACCEPTABLE);
     }
   }
 
   async deleteUser(id: string) {
-    const res = await this.userModel.findByIdAndDelete(id);
-    return res;
+    await this.userModel.findByIdAndDelete(id);
+    return true;
   }
 
   async login(loginDto: LoginDto) {
     const userInfo = await this.userModel.findOne({
       account: loginDto.account,
     });
-    if (!userInfo) return { code: 200, message: '账号不存在', data: null };
+    if (!userInfo)
+      throw new HttpException('账号不存在', HttpStatus.NOT_ACCEPTABLE);
 
     return userInfo;
   }
