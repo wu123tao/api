@@ -9,12 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  CreateUserDto,
-  LoginDto,
-  EditUserDto,
-  UserListVo,
-} from './schema/user';
+import { CreateUserDto, EditUserDto, UserListVo } from './schema/user';
 import { UsersService } from './users.service';
 
 @ApiTags('用户管理')
@@ -55,11 +50,5 @@ export class UsersController {
   @ApiOperation({ summary: '删除用户' })
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
-  }
-
-  @Post('login')
-  @ApiOperation({ summary: '用户登录' })
-  login(@Body() loginDto: LoginDto) {
-    return this.usersService.login(loginDto);
   }
 }
