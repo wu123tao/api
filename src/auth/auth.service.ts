@@ -4,6 +4,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { User } from 'src/users/db/user.model';
 import { LoginDto } from './schema/login';
 import { JwtService } from '@nestjs/jwt';
+import * as md5 from 'md5';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,11 @@ export class AuthService {
   // JWT验证 - Step 2: 校验用户信息
   async validateUser(loginDto: LoginDto) {
     console.log('JWT验证 - Step 2: 校验用户信息');
-    const user = await this.userModel.findOne(loginDto);
+    const loginInfo: LoginDto = {
+      ...loginDto,
+      password: md5(loginDto.password),
+    };
+    const user = await this.userModel.findOne(loginInfo);
 
     if (!user) throw new HttpException('账号不存在', HttpStatus.NOT_ACCEPTABLE);
 
@@ -29,7 +34,9 @@ export class AuthService {
 
     try {
       const token = this.jwtService.sign(payload);
-      return token;
+      console.log(token, '###');
+
+      return { token };
     } catch (error) {
       throw new HttpException('生成token失败', HttpStatus.BAD_REQUEST);
     }

@@ -12,13 +12,13 @@ import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [
     TypegooseModule.forFeature([User]),
-    UsersModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: jwtConstants.secret,
       // expiresIn: 60秒
       signOptions: { expiresIn: 60 },
     }),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

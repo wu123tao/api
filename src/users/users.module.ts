@@ -6,7 +6,7 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [TypegooseModule.forFeature([User])],
-  controllers: [UsersController],
+  // controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],
 })

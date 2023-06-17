@@ -7,16 +7,19 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto, EditUserDto, UserListVo } from './schema/user';
 import { UsersService } from './users.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('用户管理')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('list')
   @ApiOperation({ summary: '用户列表' })
   @ApiOkResponse({
