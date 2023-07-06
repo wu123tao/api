@@ -29,6 +29,7 @@ specifiers:
   husky: ^8.0.3
   jest: 29.5.0
   lint-staged: ^13.2.3
+  lodash: ^4.17.21
   md5: ^2.3.0
   mysql2: ^3.4.3
   passport: ^0.6.0
@@ -56,6 +57,7 @@ dependencies:
   '@nestjs/typeorm': registry.npmmirror.com/@nestjs/typeorm/10.0.0_tofl3m7y2ijbca2xxzaqebszuy
   class-transformer: registry.npmmirror.com/class-transformer/0.5.1
   class-validator: registry.npmmirror.com/class-validator/0.14.0
+  lodash: 4.17.21
   md5: registry.npmmirror.com/md5/2.3.0
   mysql2: registry.npmmirror.com/mysql2/3.4.3
   passport: 0.6.0
@@ -3095,7 +3097,7 @@ packages:
       class-transformer: registry.npmmirror.com/class-transformer/0.5.1
       class-validator: registry.npmmirror.com/class-validator/0.14.0
       js-yaml: registry.npmmirror.com/js-yaml/4.1.0
-      lodash: registry.npmmirror.com/lodash/4.17.21
+      lodash: 4.17.21
       path-to-regexp: registry.npmmirror.com/path-to-regexp/3.2.0
       reflect-metadata: registry.npmmirror.com/reflect-metadata/0.1.13
       swagger-ui-dist: registry.npmmirror.com/swagger-ui-dist/4.18.2
@@ -5688,7 +5690,7 @@ packages:
       cli-width: registry.npmmirror.com/cli-width/3.0.0
       external-editor: registry.npmmirror.com/external-editor/3.1.0
       figures: registry.npmmirror.com/figures/3.2.0
-      lodash: registry.npmmirror.com/lodash/4.17.21
+      lodash: 4.17.21
       mute-stream: registry.npmmirror.com/mute-stream/0.0.8
       ora: registry.npmmirror.com/ora/5.4.1
       run-async: registry.npmmirror.com/run-async/2.4.1
@@ -5711,7 +5713,7 @@ packages:
       cli-width: registry.npmmirror.com/cli-width/3.0.0
       external-editor: registry.npmmirror.com/external-editor/3.1.0
       figures: registry.npmmirror.com/figures/3.2.0
-      lodash: registry.npmmirror.com/lodash/4.17.21
+      lodash: 4.17.21
       mute-stream: registry.npmmirror.com/mute-stream/0.0.8
       ora: registry.npmmirror.com/ora/5.4.1
       run-async: registry.npmmirror.com/run-async/2.4.1
@@ -6536,11 +6538,6 @@ packages:
     version: 4.6.2
     dev: true
 
-  registry.npmmirror.com/lodash/4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/lodash/-/lodash-4.17.21.tgz}
-    name: lodash
-    version: 4.17.21
-
   registry.npmmirror.com/log-symbols/4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/log-symbols/-/log-symbols-4.1.0.tgz}
     name: log-symbols
@@ -6893,7 +6890,7 @@ packages:
     name: node-emoji
     version: 1.11.0
     dependencies:
-      lodash: registry.npmmirror.com/lodash/4.17.21
+      lodash: 4.17.21
     dev: true
 
   registry.npmmirror.com/node-fetch/2.6.11:

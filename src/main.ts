@@ -12,6 +12,8 @@ async function bootstrap() {
     app.useGlobalFilters(new HttpExceptionFilter());
     app.useGlobalInterceptors(new transformInterceptor());
 
+    app.enableCors();
+
     /**
      * 生成swagger文档
      */

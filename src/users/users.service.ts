@@ -7,12 +7,16 @@ import * as md5 from 'md5';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
+import { LoginDto } from './dto/login.dto';
+import { omit } from 'lodash';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private readonly jwtService: JwtService,
     ) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -93,5 +97,37 @@ export class UsersService {
         const { ids } = deleteUserDto;
         await this.usersRepository.delete(ids);
         return null;
+    }
+
+    async createToken(loginDto: LoginDto) {
+        const payload = { ...loginDto };
+        console.log('JWT验证 - Step 3: 处理 jwt 签证');
+
+        try {
+            const token = this.jwtService.sign(payload);
+
+            return token;
+        } catch (error) {
+            throw new HttpException('生成token失败', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async login(loginDto: LoginDto) {
+        console.log('JWT验证 - Step 1: 用户请求登录');
+        const { account, password } = loginDto;
+        const validateAccount = await this.usersRepository.findOneBy({
+            account,
+        });
+
+        console.log('JWT验证 - Step 2: 校验用户信息');
+        if (!validateAccount)
+            throw new HttpException('该用户不存在', HttpStatus.NOT_ACCEPTABLE);
+
+        if (md5(password) !== validateAccount.password)
+            throw new HttpException('密码错误', HttpStatus.NOT_ACCEPTABLE);
+
+        const token = await this.createToken(validateAccount);
+
+        return { ...omit(validateAccount, 'password'), token };
     }
 }

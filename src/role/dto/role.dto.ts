@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { FindOperator } from 'typeorm';
+import { IPage } from 'src/common/types';
 
-export class RoleDto {
+export class RoleDto extends IPage {
     @ApiProperty({ description: 'id', example: '', required: false })
     id: string;
 
@@ -13,10 +13,4 @@ export class RoleDto {
 
     @ApiProperty({ description: '备注', example: '', required: false })
     remark: string;
-
-    @ApiProperty({ description: '页码', example: '', required: false })
-    page: number;
-
-    @ApiProperty({ description: '每页数量', example: '', required: false })
-    pageSize: number;
 }
