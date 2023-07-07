@@ -18,6 +18,7 @@ async function bootstrap() {
      * 生成swagger文档
      */
     const config = new DocumentBuilder()
+        .addBearerAuth()
         .setTitle('DEMO Nest API')
         .setDescription('第一个nestjs API项目')
         .setVersion('2.0')

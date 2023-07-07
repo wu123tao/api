@@ -30,7 +30,7 @@ export class RoleService {
     }
 
     async findAll(roleDto: RoleDto) {
-        const { roleCode, roleName, remark, page = 1, pageSize = 2 } = roleDto;
+        const { roleCode, roleName, remark, page = 1, limit = 2 } = roleDto;
         const queryFilter = {
             ...roleDto,
             roleCode: Like(`%${roleCode ?? ''}%`),
@@ -40,17 +40,18 @@ export class RoleService {
 
         const res = await this.roleRepository.findAndCount({
             where: queryFilter,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
+            skip: (page - 1) * limit,
+            take: limit,
         });
 
-        const pages = Math.ceil(res[1] / pageSize);
+        const pages = Math.ceil(res[1] / limit);
 
         return {
             pages,
             records: res[0],
-            size: pageSize,
+            size: limit,
             total: res[1],
+            current: page,
         };
     }
 

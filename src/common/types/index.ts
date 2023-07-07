@@ -5,5 +5,5 @@ export class IPage {
     page: number;
 
     @ApiProperty({ description: '每页数量', example: '', required: false })
-    pageSize: number;
+    limit: number;
 }

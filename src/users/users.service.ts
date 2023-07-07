@@ -35,27 +35,29 @@ export class UsersService {
     }
 
     async findList(userDto: UserDto) {
-        const { account, userName, remark, page = 1, pageSize = 2 } = userDto;
+        const { account, userName, remark, page = 1, limit = 2 } = userDto;
         const queryFilter = {
             ...userDto,
             account: Like(`%${account ?? ''}%`),
             userName: Like(`%${userName ?? ''}%`),
             remark: Like(`%${remark ?? ''}%`),
         };
+        // this.usersRepository.
+        const users = this.usersRepository
+            .createQueryBuilder('t_user')
+            .where(queryFilter)
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
+        // console.log(users);
 
-        const res = await this.usersRepository.findAndCount({
-            where: queryFilter,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        });
-
-        const pages = Math.ceil(res[1] / pageSize);
-
+        const pages = Math.ceil(users[1] / limit);
         return {
             pages,
-            records: res[0],
-            size: pageSize,
-            total: res[1],
+            records: users[0],
+            size: limit,
+            total: users[1],
+            current: page,
         };
     }
 
