@@ -6,23 +6,26 @@ import { HttpExceptionFilter } from './common/filters/http-exception';
 import { transformInterceptor } from './common/interceptor/interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new transformInterceptor());
+    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalInterceptors(new transformInterceptor());
 
-  /**
-   * 生成swagger文档
-   */
-  const config = new DocumentBuilder()
-    .setTitle('DEMO Nest API')
-    .setDescription('第一个nestjs API项目')
-    .setVersion('2.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+    app.enableCors();
 
-  await app.listen(3000);
+    /**
+     * 生成swagger文档
+     */
+    const config = new DocumentBuilder()
+        .addBearerAuth()
+        .setTitle('DEMO Nest API')
+        .setDescription('第一个nestjs API项目')
+        .setVersion('2.0')
+        .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, document);
+
+    await app.listen(3000);
 }
 bootstrap();
