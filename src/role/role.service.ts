@@ -6,6 +6,7 @@ import { Role } from './entities/role.entity';
 import { Like, Repository } from 'typeorm';
 import { DeleteRoleDto } from './dto/delete-role.dto';
 import { RoleDto } from './dto/role.dto';
+import { IPage } from 'src/common/types';
 
 @Injectable()
 export class RoleService {
@@ -29,8 +30,10 @@ export class RoleService {
         return null;
     }
 
-    async findAll(roleDto: RoleDto) {
-        const { roleCode, roleName, remark, page = 1, limit = 2 } = roleDto;
+    async findAll(roleDto: RoleDto, pageParams: IPage) {
+        const { roleCode, roleName, remark } = roleDto;
+
+        const { limit, page } = pageParams;
         const queryFilter = {
             ...roleDto,
             roleCode: Like(`%${roleCode ?? ''}%`),

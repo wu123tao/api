@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { omit } from 'lodash';
 
 @ApiTags('用户管理')
 @Controller('users')
@@ -17,7 +18,12 @@ export class UsersController {
     @Get('list')
     @ApiOperation({ summary: '用户列表' })
     findAll(@Query() userDto: UserDto) {
-        return this.usersService.findList(userDto);
+        const searchParams = { ...omit(userDto, ['page', 'limit']) } as UserDto;
+        const pageParams = {
+            limit: userDto.limit ?? 3,
+            page: userDto.page ?? 1,
+        };
+        return this.usersService.findList(searchParams, pageParams);
     }
 
     @Post('save')

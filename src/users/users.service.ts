@@ -10,6 +10,7 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { omit } from 'lodash';
 import { JwtService } from '@nestjs/jwt';
+import { IPage } from 'src/common/types';
 
 @Injectable()
 export class UsersService {
@@ -34,22 +35,23 @@ export class UsersService {
         return null;
     }
 
-    async findList(userDto: UserDto) {
-        const { account, userName, remark, page = 1, limit = 2 } = userDto;
+    async findList(userDto: UserDto, pageParams: IPage) {
+        const { account, userName, remark } = userDto;
+
+        const { limit, page } = pageParams;
+
         const queryFilter = {
             ...userDto,
             account: Like(`%${account ?? ''}%`),
             userName: Like(`%${userName ?? ''}%`),
             remark: Like(`%${remark ?? ''}%`),
         };
-        // this.usersRepository.
-        const users = this.usersRepository
-            .createQueryBuilder('t_user')
-            .where(queryFilter)
-            .skip((page - 1) * limit)
-            .take(limit)
-            .getManyAndCount();
-        // console.log(users);
+
+        const users = this.usersRepository.findAndCount({
+            where: queryFilter,
+            skip: (page - 1) * limit,
+            take: limit,
+        });
 
         const pages = Math.ceil(users[1] / limit);
         return {

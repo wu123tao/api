@@ -5,6 +5,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DeleteRoleDto } from './dto/delete-role.dto';
 import { RoleDto } from './dto/role.dto';
+import { omit } from 'lodash';
 
 @ApiTags('角色管理')
 @Controller('role')
@@ -14,7 +15,12 @@ export class RoleController {
     @Get('list')
     @ApiOperation({ summary: '角色列表' })
     findAll(@Query() roleDto: RoleDto) {
-        return this.roleService.findAll(roleDto);
+        const searchParams = { ...omit(roleDto, ['page', 'limit']) } as RoleDto;
+        const pageParams = {
+            limit: roleDto.limit ?? 3,
+            page: roleDto.page ?? 1,
+        };
+        return this.roleService.findAll(searchParams, pageParams);
     }
 
     @Post('save')
