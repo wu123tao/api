@@ -10,7 +10,8 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { omit } from 'lodash';
 import { JwtService } from '@nestjs/jwt';
-import { IPage } from 'src/common/types';
+import { BaseSearchDto } from 'src/common/dto/search-params.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,22 +30,22 @@ export class UsersService {
 
         const res = await this.usersRepository.save({
             ...createUserDto,
-            password: md5(createUserDto.password),
+            password: md5(createUserDto.password ?? '123456'),
         });
         if (!res) throw new HttpException('操作失败', HttpStatus.BAD_REQUEST);
         return null;
     }
 
-    async findList(userDto: UserDto, pageParams: IPage) {
-        const { account, userName, remark } = userDto;
+    async findList(userDto: UserDto, pageParams: BaseSearchDto) {
+        const { account, userName, userCode } = userDto;
 
         const { limit, page } = pageParams;
 
         const queryFilter = {
             ...userDto,
+            userCode: Like(`%${userCode ?? ''}%`),
             account: Like(`%${account ?? ''}%`),
             userName: Like(`%${userName ?? ''}%`),
-            remark: Like(`%${remark ?? ''}%`),
         };
 
         const users = this.usersRepository.findAndCount({
@@ -69,23 +70,12 @@ export class UsersService {
     }
 
     async update(updateUserDto: UpdateUserDto) {
-        const { id, account } = updateUserDto;
+        const { id } = updateUserDto;
 
         const validId = await this.usersRepository.findOneBy({ id });
 
         if (!validId) {
             throw new HttpException('该用户不存在', HttpStatus.NOT_ACCEPTABLE);
-        }
-        if (account) {
-            const validAccount = await this.usersRepository.findOneBy({
-                account: account,
-            });
-            if (validAccount) {
-                throw new HttpException(
-                    '账号已存在',
-                    HttpStatus.NOT_ACCEPTABLE,
-                );
-            }
         }
 
         const validUpdate = await this.usersRepository.update(
@@ -100,6 +90,19 @@ export class UsersService {
     async remove(deleteUserDto: DeleteUserDto) {
         const { ids } = deleteUserDto;
         await this.usersRepository.delete(ids);
+        return null;
+    }
+
+    async resetPassword(userDto: ResetPasswordDto) {
+        const { id } = userDto;
+        const validId = await this.usersRepository.findOneBy({ id });
+
+        if (!validId) {
+            throw new HttpException('该用户不存在', HttpStatus.NOT_ACCEPTABLE);
+        }
+        await this.usersRepository.update(id, {
+            password: md5('123456'),
+        });
         return null;
     }
 

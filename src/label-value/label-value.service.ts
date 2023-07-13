@@ -15,7 +15,6 @@ export class LabelValueService {
 
     async roleListDropDown() {
         const res = await this.roleRepository.find();
-        console.log(res);
         const list = res.map((item) => ({
             value: item.id,
             label: item.roleCode,
@@ -25,7 +24,6 @@ export class LabelValueService {
 
     async userListDropDown() {
         const res = await this.userRepository.find();
-        console.log(res);
         const list = res.map((item) => ({
             value: item.id,
             label: item.userName,

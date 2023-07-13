@@ -5,7 +5,7 @@ export class Role {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ name: 'roleCode', comment: '角色编码', nullable: true })
+    @Column({ name: 'role_code', comment: '角色编码', nullable: true })
     roleCode: string;
 
     @Column({ name: 'role_name', comment: '角色名', nullable: true })
