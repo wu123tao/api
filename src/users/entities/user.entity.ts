@@ -1,15 +1,8 @@
-import {
-    Entity,
-    Column,
-    PrimaryGeneratedColumn,
-    CreateDateColumn,
-} from 'typeorm';
+import { Base } from 'src/common/entities/base.entity';
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 
 @Entity({ name: 't_user' })
-export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-
+export class User extends Base {
     @Column({ name: 'user_name', comment: '用户名', nullable: true })
     userName: string;
 
@@ -33,15 +26,4 @@ export class User {
 
     @Column({ name: 'user_phone', comment: '手机号', nullable: true })
     userPhone: string;
-
-    @Column({ name: 'remark', comment: '备注', nullable: true })
-    remark: string;
-
-    @CreateDateColumn({
-        name: 'edit_time',
-        comment: '备注',
-        nullable: true,
-        type: 'timestamp',
-    })
-    editTime: Date;
 }
