@@ -48,7 +48,7 @@ export class UsersService {
             userName: Like(`%${userName ?? ''}%`),
         };
 
-        const users = this.usersRepository.findAndCount({
+        const users = await this.usersRepository.findAndCount({
             where: queryFilter,
             skip: (page - 1) * limit,
             take: limit,

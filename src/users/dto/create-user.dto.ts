@@ -19,10 +19,10 @@ export class CreateUserDto {
     @ApiProperty({ description: '角色名', required: true })
     roleName: string;
 
-    @ApiProperty({ description: '邮箱', required: true })
+    @ApiProperty({ description: '邮箱', required: false })
     userEmail: string;
 
-    @ApiProperty({ description: '手机号', required: true })
+    @ApiProperty({ description: '手机号', required: false })
     userPhone: string;
 
     @ApiProperty({ description: '备注', required: false })

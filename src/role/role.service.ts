@@ -31,14 +31,13 @@ export class RoleService {
     }
 
     async findAll(roleDto: RoleDto, pageParams: BaseSearchDto) {
-        const { roleCode, roleName, remark } = roleDto;
+        const { roleCode, roleName } = roleDto;
 
         const { limit, page } = pageParams;
         const queryFilter = {
             ...roleDto,
             roleCode: Like(`%${roleCode ?? ''}%`),
             roleName: Like(`%${roleName ?? ''}%`),
-            remark: Like(`%${remark ?? ''}%`),
         };
 
         const res = await this.roleRepository.findAndCount({
