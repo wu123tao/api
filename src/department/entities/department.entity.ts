@@ -1,3 +1,4 @@
+import { Base } from 'src/common/entities/base.entity';
 import {
     Column,
     CreateDateColumn,
@@ -7,31 +8,16 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 't_department' })
-export class Department {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-
+export class Department extends Base {
     @Column({ name: 'department_code', comment: '部门编号', nullable: true })
     departmentCode: string;
 
     @Column({ name: 'department_name', comment: '部门名称', nullable: true })
     departmentName: string;
 
-    @Column({ name: 'remark', comment: '备注', nullable: true })
-    remark: string;
+    @Column({ name: 'deptParent_id', comment: '父级部门id', nullable: true })
+    deptParentId: string;
 
-    @CreateDateColumn({
-        name: 'add_time',
-        comment: '添加时间',
-        nullable: true,
-    })
-    addTime: Date;
-
-    @UpdateDateColumn({
-        name: 'edit_time',
-        comment: '编辑时间',
-        nullable: true,
-        update: false,
-    })
-    editTime: Date;
+    @Column({ name: 'organization_id', comment: '组织id', nullable: true })
+    organizationId: string;
 }
