@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IPage } from 'src/common/types';
+import { BaseSearchDto } from 'src/common/dto/search-params.dto';
 
-export class RoleDto extends IPage {
+export class RoleDto extends BaseSearchDto {
     @ApiProperty({ description: 'id', example: '', required: false })
     id: string;
 

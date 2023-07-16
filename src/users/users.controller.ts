@@ -8,6 +8,7 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { omit } from 'lodash';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('用户管理')
 @Controller('users')
@@ -48,6 +49,12 @@ export class UsersController {
     @ApiOperation({ summary: '用户详情' })
     detail(@Query('id') id: string) {
         return this.usersService.findOne(id);
+    }
+
+    @Post('resetPassword')
+    @ApiOperation({ summary: '重置密码' })
+    resetPassword(@Body() userDto: ResetPasswordDto) {
+        return this.usersService.resetPassword(userDto);
     }
 
     @Post('login')

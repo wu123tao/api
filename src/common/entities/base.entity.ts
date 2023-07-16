@@ -1,21 +1,13 @@
 import {
     Column,
-    CreateDateColumn,
-    Entity,
     PrimaryGeneratedColumn,
+    CreateDateColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 't_role' })
-export class Role {
+export class Base {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
-    @Column({ name: 'role_code', comment: '角色编码', nullable: true })
-    roleCode: string;
-
-    @Column({ name: 'role_name', comment: '角色名', nullable: true })
-    roleName: string;
 
     @Column({ name: 'remark', comment: '备注', nullable: true })
     remark: string;

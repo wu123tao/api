@@ -13,16 +13,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const response = ctx.getResponse<Response>();
         const status = exception.getStatus();
         const message = exception.message;
-        // console.log('错误提示', message, request);
+        console.log('错误提示', message);
 
-        response.status(status).json({
+        response.status(200).json({
             code: status,
             message: message,
             data: null,
         });
-        // 设置返回的状态码、请求头、发送错误信息
-        // response.status(status);
-        // response.header('Content-Type', 'application/json; charset=utf-8');
-        // response.send(errorResponse);
     }
 }

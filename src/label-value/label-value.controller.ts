@@ -31,4 +31,16 @@ export class LabelValueController {
     findUserList() {
         return this.labelValueService.userListDropDown();
     }
+
+    @Get('organization')
+    @ApiOperation({ summary: '组织下拉' })
+    @ApiResponse({
+        status: 200,
+        description: '响应成功',
+        type: LabelValueVo,
+        isArray: true,
+    })
+    findOrganizationList() {
+        return this.labelValueService.organizationListDropDown();
+    }
 }

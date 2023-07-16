@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class IPage {
+export class BaseSearchDto {
     @ApiProperty({ description: '页码', example: '', required: false })
     page: number;
 

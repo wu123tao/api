@@ -6,7 +6,7 @@ import { Role } from './entities/role.entity';
 import { Like, Repository } from 'typeorm';
 import { DeleteRoleDto } from './dto/delete-role.dto';
 import { RoleDto } from './dto/role.dto';
-import { IPage } from 'src/common/types';
+import { BaseSearchDto } from 'src/common/dto/search-params.dto';
 
 @Injectable()
 export class RoleService {
@@ -30,15 +30,14 @@ export class RoleService {
         return null;
     }
 
-    async findAll(roleDto: RoleDto, pageParams: IPage) {
-        const { roleCode, roleName, remark } = roleDto;
+    async findAll(roleDto: RoleDto, pageParams: BaseSearchDto) {
+        const { roleCode, roleName } = roleDto;
 
         const { limit, page } = pageParams;
         const queryFilter = {
             ...roleDto,
             roleCode: Like(`%${roleCode ?? ''}%`),
             roleName: Like(`%${roleName ?? ''}%`),
-            remark: Like(`%${remark ?? ''}%`),
         };
 
         const res = await this.roleRepository.findAndCount({
@@ -60,26 +59,16 @@ export class RoleService {
 
     async findOne(id: string) {
         const res = await this.roleRepository.findOneBy({ id });
-        console.log(res);
         return res;
     }
 
     async update(updateRoleDto: UpdateRoleDto) {
-        const { id, roleCode } = updateRoleDto;
+        const { id } = updateRoleDto;
 
         const validId = await this.roleRepository.findOneBy({ id });
 
         if (!validId) {
             throw new HttpException('该角色不存在', HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        const validRoleCode = await this.roleRepository.findOneBy({ roleCode });
-
-        if (validRoleCode) {
-            throw new HttpException(
-                '角色编码已存在',
-                HttpStatus.NOT_ACCEPTABLE,
-            );
         }
 
         const validUpdate = await this.roleRepository.update(id, updateRoleDto);
