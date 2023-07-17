@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
@@ -22,7 +22,8 @@ import { LoginVo } from './vo/login.vo';
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
-    // @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('list')
     @ApiOperation({ summary: '用户列表' })
     @PageResponse(UserVo)
@@ -35,6 +36,8 @@ export class UsersController {
         return this.usersService.findList(searchParams, pageParams);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('save')
     @ApiOperation({ summary: '添加用户' })
     @OKResponse()
@@ -42,6 +45,8 @@ export class UsersController {
         return this.usersService.create(createUserDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('edit')
     @ApiOperation({ summary: '编辑用户' })
     @OKResponse()
@@ -49,6 +54,8 @@ export class UsersController {
         return this.usersService.update(updateRoleDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('delete')
     @ApiOperation({ summary: '删除用户' })
     @OKResponse()
@@ -56,6 +63,8 @@ export class UsersController {
         return this.usersService.remove(deleteRoleDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('detail')
     @ApiOperation({ summary: '用户详情' })
     @OKResponseData(UserVo)
@@ -63,6 +72,8 @@ export class UsersController {
         return this.usersService.findOne(id);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('resetPassword')
     @ApiOperation({ summary: '重置密码' })
     @OKResponse()
@@ -70,10 +81,12 @@ export class UsersController {
         return this.usersService.resetPassword(userDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('login')
     @ApiOperation({ summary: '登录' })
     @OKResponseData(LoginVo)
-    async login(@Body() loginDto: LoginDto) {
+    login(@Body() loginDto: LoginDto) {
         return this.usersService.login(loginDto);
     }
 }

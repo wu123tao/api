@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganizationDto } from './dto/organization.dto';
 import { omit } from 'lodash';
 import { DeleteOrganizationDto } from './dto/delete-organization.dto';
@@ -12,12 +12,15 @@ import {
     PageResponse,
 } from 'src/common/decorators/response.decorator';
 import { OrganizationVo } from './vo/organization.vo';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('组织管理')
 @Controller('organization')
 export class OrganizationController {
     constructor(private readonly organizationService: OrganizationService) {}
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('save')
     @ApiOperation({ summary: '新增组织' })
     @OKResponse()
@@ -25,6 +28,8 @@ export class OrganizationController {
         return this.organizationService.create(createOrganizationDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('list')
     @ApiOperation({ summary: '组织列表' })
     @PageResponse(OrganizationVo)
@@ -40,6 +45,8 @@ export class OrganizationController {
         return this.organizationService.findAll(searchParams, pageParams);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('detail')
     @ApiOperation({ summary: '详情' })
     @OKResponseData(OrganizationVo)
@@ -47,6 +54,8 @@ export class OrganizationController {
         return this.organizationService.findOne(id);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('edit')
     @ApiOperation({ summary: '编辑组织' })
     @OKResponse()
@@ -54,6 +63,8 @@ export class OrganizationController {
         return this.organizationService.update(updateOrganizationDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('delete')
     @ApiOperation({ summary: '删除组织' })
     @OKResponse()
