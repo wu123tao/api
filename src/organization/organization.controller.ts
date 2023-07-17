@@ -6,6 +6,12 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganizationDto } from './dto/organization.dto';
 import { omit } from 'lodash';
 import { DeleteOrganizationDto } from './dto/delete-organization.dto';
+import {
+    OKResponse,
+    OKResponseData,
+    PageResponse,
+} from 'src/common/decorators/response.decorator';
+import { OrganizationVo } from './vo/organization.vo';
 
 @ApiTags('组织管理')
 @Controller('organization')
@@ -14,12 +20,14 @@ export class OrganizationController {
 
     @Post('save')
     @ApiOperation({ summary: '新增组织' })
+    @OKResponse()
     create(@Body() createOrganizationDto: CreateOrganizationDto) {
         return this.organizationService.create(createOrganizationDto);
     }
 
     @Get('list')
     @ApiOperation({ summary: '组织列表' })
+    @PageResponse(OrganizationVo)
     findAll(@Query() organizationDto: OrganizationDto) {
         const searchParams = {
             ...omit(organizationDto, ['page', 'limit']),
@@ -33,18 +41,22 @@ export class OrganizationController {
     }
 
     @Get('detail')
+    @ApiOperation({ summary: '详情' })
+    @OKResponseData(OrganizationVo)
     findOne(@Query('id') id: string) {
         return this.organizationService.findOne(id);
     }
 
     @Post('edit')
     @ApiOperation({ summary: '编辑组织' })
+    @OKResponse()
     update(@Body() updateOrganizationDto: UpdateOrganizationDto) {
         return this.organizationService.update(updateOrganizationDto);
     }
 
     @Post('delete')
     @ApiOperation({ summary: '删除组织' })
+    @OKResponse()
     remove(@Body() deleteOrganizationDto: DeleteOrganizationDto) {
         return this.organizationService.remove(deleteOrganizationDto);
     }

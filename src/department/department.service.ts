@@ -96,6 +96,9 @@ export class DepartmentService {
         list.forEach((item) => {
             const parent = map[item.deptParentId];
             if (parent) {
+                if (!parent.departmentVoList) {
+                    parent.departmentVoList = [];
+                }
                 parent.departmentVoList.push(item);
             } else {
                 treeArr.push(item);
