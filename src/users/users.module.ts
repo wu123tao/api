@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { jwtConstants } from './constant';
 import { JwtStrategy } from './jwt.strategy';
+import { jwtConstants } from 'src/common/const/jwt.const';
 
 @Module({
     imports: [

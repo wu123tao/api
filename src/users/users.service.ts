@@ -106,7 +106,7 @@ export class UsersService {
         return null;
     }
 
-    async createToken(loginDto: LoginDto) {
+    createToken(loginDto: LoginDto) {
         const payload = { ...loginDto };
         console.log('JWT验证 - Step 3: 处理 jwt 签证');
 
@@ -133,7 +133,7 @@ export class UsersService {
         if (md5(password) !== validateAccount.password)
             throw new HttpException('密码错误', HttpStatus.NOT_ACCEPTABLE);
 
-        const token = await this.createToken(validateAccount);
+        const token = this.createToken(validateAccount);
 
         return { ...omit(validateAccount, 'password'), token };
     }

@@ -14,13 +14,13 @@ import {
 import { OrganizationVo } from './vo/organization.vo';
 import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('组织管理')
 @Controller('organization')
 export class OrganizationController {
     constructor(private readonly organizationService: OrganizationService) {}
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('save')
     @ApiOperation({ summary: '新增组织' })
     @OKResponse()
@@ -28,8 +28,6 @@ export class OrganizationController {
         return this.organizationService.create(createOrganizationDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Get('list')
     @ApiOperation({ summary: '组织列表' })
     @PageResponse(OrganizationVo)
@@ -45,8 +43,6 @@ export class OrganizationController {
         return this.organizationService.findAll(searchParams, pageParams);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Get('detail')
     @ApiOperation({ summary: '详情' })
     @OKResponseData(OrganizationVo)
@@ -54,8 +50,6 @@ export class OrganizationController {
         return this.organizationService.findOne(id);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('edit')
     @ApiOperation({ summary: '编辑组织' })
     @OKResponse()
@@ -63,8 +57,6 @@ export class OrganizationController {
         return this.organizationService.update(updateOrganizationDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('delete')
     @ApiOperation({ summary: '删除组织' })
     @OKResponse()

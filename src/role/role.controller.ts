@@ -22,13 +22,13 @@ import {
 import { RoleVo } from './vo/role.vo';
 import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('角色管理')
 @Controller('role')
 export class RoleController {
     constructor(private readonly roleService: RoleService) {}
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Get('list')
     @ApiOperation({ summary: '角色列表' })
     @PageResponse(RoleVo)
@@ -41,8 +41,6 @@ export class RoleController {
         return this.roleService.findAll(searchParams, pageParams);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('save')
     @ApiOperation({ summary: '新增角色' })
     @OKResponse()
@@ -50,8 +48,6 @@ export class RoleController {
         return this.roleService.create(createRoleDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('edit')
     @OKResponse()
     @ApiOperation({ summary: '编辑角色' })
@@ -59,8 +55,6 @@ export class RoleController {
         return this.roleService.update(updateRoleDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('delete')
     @ApiOperation({ summary: '删除角色' })
     @OKResponse()
@@ -68,8 +62,6 @@ export class RoleController {
         return this.roleService.remove(deleteRoleDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Get('detail')
     @ApiOperation({ summary: '角色详情' })
     @OKResponseData(RoleVo)

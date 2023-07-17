@@ -13,13 +13,13 @@ import { DepartmentVo } from './vo/department.vo';
 import { DepartmentItemVo } from './vo/departmentItem.vo';
 import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('部门管理')
 @Controller('department')
 export class DepartmentController {
     constructor(private readonly departmentService: DepartmentService) {}
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('save')
     @ApiOperation({ summary: '新增部门' })
     @OKResponse()
@@ -27,8 +27,6 @@ export class DepartmentController {
         return this.departmentService.create(createDepartmentDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Get('list')
     @ApiOperation({ summary: '根据组织部门列表' })
     @OKResponseData(DepartmentVo)
@@ -36,8 +34,6 @@ export class DepartmentController {
         return this.departmentService.findAll(departmentDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Get('detail')
     @ApiOperation({ summary: '详情' })
     @OKResponseData(DepartmentItemVo)
@@ -45,8 +41,6 @@ export class DepartmentController {
         return this.departmentService.findOne(id);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('edit')
     @ApiOperation({ summary: '编辑部门' })
     @OKResponse()
@@ -54,8 +48,6 @@ export class DepartmentController {
         return this.departmentService.update(updateDepartmentDto);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
     @Post('delete')
     @ApiOperation({ summary: '删除部门' })
     @OKResponse()
