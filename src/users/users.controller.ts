@@ -27,8 +27,8 @@ export class UsersController {
     findAll(@Query() userDto: UserDto) {
         const searchParams = { ...omit(userDto, ['page', 'limit']) } as UserDto;
         const pageParams = {
-            limit: userDto.limit ?? 3,
-            page: userDto.page ?? 1,
+            limit: userDto.limit || 5,
+            page: userDto.page || 1,
         };
         return this.usersService.findList(searchParams, pageParams);
     }

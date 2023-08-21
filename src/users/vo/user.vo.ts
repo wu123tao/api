@@ -16,6 +16,12 @@ export class UserVo {
     @ApiProperty({ description: '角色id', default: '' })
     roleId: string;
 
+    @ApiProperty({ description: '角色名', default: '' })
+    roleName: string;
+
+    @ApiProperty({ description: '角色编号', default: '' })
+    roleCode: string;
+
     @ApiProperty({ description: '邮箱', default: '' })
     userEmail: string;
 

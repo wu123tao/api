@@ -1,5 +1,5 @@
 import { Base } from 'src/common/entities/base.entity';
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 
 @Entity({ name: 't_user' })
 export class User extends Base {
@@ -17,9 +17,6 @@ export class User extends Base {
 
     @Column({ name: 'role_id', comment: '角色id', nullable: true })
     roleId: string;
-
-    @Column({ name: 'role_name', comment: '角色名', nullable: true })
-    roleName: string;
 
     @Column({ name: 'user_email', comment: '邮箱', nullable: true })
     userEmail: string;

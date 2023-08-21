@@ -7,10 +7,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { jwtConstants } from 'src/common/const/jwt.const';
+import { Role } from 'src/role/entities/role.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User, Role]),
         JwtModule.register({
             secret: jwtConstants.secret,
             signOptions: { expiresIn: 6 * 60 },

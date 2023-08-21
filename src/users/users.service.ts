@@ -12,6 +12,7 @@ import { omit } from 'lodash';
 import { JwtService } from '@nestjs/jwt';
 import { BaseSearchDto } from 'src/common/dto/search-params.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Role } from 'src/role/entities/role.entity';
 
 @Injectable()
 export class UsersService {
@@ -48,18 +49,45 @@ export class UsersService {
             userName: Like(`%${userName ?? ''}%`),
         };
 
-        const users = await this.usersRepository.findAndCount({
-            where: queryFilter,
-            skip: (page - 1) * limit,
-            take: limit,
-        });
+        // const rows = await this.usersRepository
+        //     .createQueryBuilder('user')
+        //     .skip((page - 1) * limit)
+        //     .take(limit)
+        //     .getMany();
 
-        const pages = Math.ceil(users[1] / limit);
+        const queryBuilder = this.usersRepository.createQueryBuilder('user');
+
+        const total = (await queryBuilder.getRawMany()).length;
+
+        const rows = await queryBuilder
+            .leftJoinAndSelect(Role, 'role', 'role.id = user.role_id')
+            // .skip((page - 1) * limit)
+            // .take(limit)
+            .limit(limit)
+            .offset((page - 1) * limit)
+            .select(
+                `
+                user.id,
+                user.account,
+                user.user_code as userCode,
+                user.user_name as userName,
+                user.user_email as userEmail,
+                user.user_phone as userPhone,
+                user.remark,
+                user.role_id as roleId,
+                role.role_code as roleCode,
+                role.role_name as roleName
+                `,
+            )
+            .where(queryFilter)
+            .getRawMany();
+        const pages = Math.ceil(total / limit);
+
         return {
             pages,
-            records: users[0],
+            records: rows,
             size: limit,
-            total: users[1],
+            total,
             current: page,
         };
     }

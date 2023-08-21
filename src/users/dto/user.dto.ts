@@ -14,9 +14,6 @@ export class UserDto extends BaseSearchDto {
     @ApiProperty({ description: '账号', required: false })
     account: string;
 
-    @ApiProperty({ description: '角色id', required: false })
-    roleId: string;
-
     @ApiProperty({ description: '邮箱', required: false })
     userEmail: string;
 

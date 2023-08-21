@@ -16,9 +16,6 @@ export class CreateUserDto {
     @ApiProperty({ description: '角色id', required: true })
     roleId: string;
 
-    @ApiProperty({ description: '角色名', required: true })
-    roleName: string;
-
     @ApiProperty({ description: '邮箱', required: false })
     userEmail: string;
 
