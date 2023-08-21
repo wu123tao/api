@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { jwtConstants } from 'src/common/const/jwt.const';
-import { Role } from 'src/role/entities/role.entity';
+import { Role } from 'src/modules/role/entities/role.entity';
 
 @Module({
     imports: [

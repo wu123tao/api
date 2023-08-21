@@ -1,11 +1,5 @@
 import { Base } from 'src/common/entities/base.entity';
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
 @Entity({ name: 't_department' })
 export class Department extends Base {

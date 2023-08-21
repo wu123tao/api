@@ -16,6 +16,7 @@ export class Base {
         name: 'add_time',
         comment: '添加时间',
         nullable: true,
+        select: false,
     })
     addTime: Date;
 
@@ -24,6 +25,7 @@ export class Base {
         comment: '编辑时间',
         nullable: true,
         update: false,
+        select: false,
     })
     editTime: Date;
 }

@@ -12,7 +12,7 @@ import { omit } from 'lodash';
 import { JwtService } from '@nestjs/jwt';
 import { BaseSearchDto } from 'src/common/dto/search-params.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { Role } from 'src/role/entities/role.entity';
+import { Role } from 'src/modules/role/entities/role.entity';
 
 @Injectable()
 export class UsersService {
@@ -37,6 +37,13 @@ export class UsersService {
         return null;
     }
 
+    /**
+     * 连表查询
+     * getMany()进行分页时
+     *  只能使用 skip() 和 take()
+     * getRawMany()进行分页时
+     *  只能使用 limit() 和 offset()
+     */
     async findList(userDto: UserDto, pageParams: BaseSearchDto) {
         const { account, userName, userCode } = userDto;
 
@@ -49,20 +56,45 @@ export class UsersService {
             userName: Like(`%${userName ?? ''}%`),
         };
 
-        // const rows = await this.usersRepository
+        /**
+         * 方法一
+         * 此方法没法把role表中的信息与user表的信息做平级处理
+         * 但是获取的数据的字段是实体类里的字段，无需做转换处理
+         */
+        // const [rows, total] = await this.usersRepository
         //     .createQueryBuilder('user')
+        //     .leftJoinAndMapOne(
+        //         'user.roleId',
+        //         Role,
+        //         'role',
+        //         'role.id = user.roleId',
+        //     )
+        //     .where(queryFilter)
         //     .skip((page - 1) * limit)
         //     .take(limit)
-        //     .getMany();
+        //     .select()
+        //     .getManyAndCount();
 
+        // const pages = Math.ceil(total / limit);
+        // return {
+        //     pages,
+        //     records: rows,
+        //     size: limit,
+        //     total,
+        //     current: page,
+        // };
+
+        /**
+         * 方法二
+         * 此方法可以把role表中的信息与user表的信息做平级处理
+         * 但是获取的数据的字段名是表中的原生字段，需做转换处理
+         */
         const queryBuilder = this.usersRepository.createQueryBuilder('user');
 
         const total = (await queryBuilder.getRawMany()).length;
 
         const rows = await queryBuilder
             .leftJoinAndSelect(Role, 'role', 'role.id = user.role_id')
-            // .skip((page - 1) * limit)
-            // .take(limit)
             .limit(limit)
             .offset((page - 1) * limit)
             .select(

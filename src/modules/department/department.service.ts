@@ -6,7 +6,7 @@ import { CreateDepartmentDto } from './dto/create-department.dto';
 import { DepartmentDto } from './dto/department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { DeleteDepartmentDto } from './dto/delete-department.dto';
-import { Organization } from 'src/organization/entities/organization.entity';
+import { Organization } from 'src/modules/organization/entities/organization.entity';
 
 @Injectable()
 export class DepartmentService {

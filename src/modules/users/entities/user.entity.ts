@@ -12,7 +12,12 @@ export class User extends Base {
     @Column({ name: 'account', comment: '账号', nullable: true })
     account: string;
 
-    @Column({ name: 'password', comment: '密码', nullable: true })
+    @Column({
+        name: 'password',
+        comment: '密码',
+        nullable: true,
+        select: false,
+    })
     password: string;
 
     @Column({ name: 'role_id', comment: '角色id', nullable: true })

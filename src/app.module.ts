@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { RoleModule } from './role/role.module';
-import { LabelValueModule } from './label-value/label-value.module';
-import { OrganizationModule } from './organization/organization.module';
-import { DepartmentModule } from './department/department.module';
+import { RoleModule } from './modules/role/role.module';
+import { LabelValueModule } from './modules/label-value/label-value.module';
+import { OrganizationModule } from './modules/organization/organization.module';
+import { DepartmentModule } from './modules/department/department.module';
 
 @Module({
     imports: [
@@ -20,6 +20,8 @@ import { DepartmentModule } from './department/department.module';
             database: 'test',
             entities: [join(__dirname, '**', '*.entity.{js,ts}')],
             synchronize: true,
+            // 输出sql语句
+            logging: true,
         }),
         UsersModule,
         RoleModule,
