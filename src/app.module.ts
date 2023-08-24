@@ -8,6 +8,7 @@ import { RoleModule } from './modules/role/role.module';
 import { LabelValueModule } from './modules/label-value/label-value.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { DepartmentModule } from './modules/department/department.module';
+import { MinioModule } from './modules/minio/minio.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { DepartmentModule } from './modules/department/department.module';
         LabelValueModule,
         OrganizationModule,
         DepartmentModule,
+        MinioModule,
     ],
     controllers: [AppController],
     providers: [AppService],
