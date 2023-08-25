@@ -58,14 +58,14 @@ export class MinioController {
     }
 
     @Post('save')
-    @ApiOperation({ summary: '添加redis缓存' })
+    @ApiOperation({ summary: '测试redis(添加redis缓存)' })
     @OKResponse()
     save(@Body() createMinIODto: CreateMinIODto) {
         return this.minioService.save(createMinIODto);
     }
 
     @Get('save')
-    @ApiOperation({ summary: '获取redis缓存' })
+    @ApiOperation({ summary: '测试redis(获取redis缓存)' })
     @OKResponse()
     getCache() {
         return this.minioService.getCache();

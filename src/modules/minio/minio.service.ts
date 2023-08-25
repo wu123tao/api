@@ -8,11 +8,13 @@ import { Cache } from 'cache-manager';
 export class MinioService {
     private readonly minioClient: MinIO.Client;
     private readonly bucket: string = process.env.MINIO_BUCKET;
+    private chunkCount: number = 0;
 
     constructor(
         @Inject(CACHE_MANAGER)
         private cacheManager: Cache,
     ) {
+        this.chunkCount = 0;
         this.minioClient = new MinIO.Client({
             endPoint: process.env.SERVER_URL,
             port: Number(process.env.MINIO_PORT),
@@ -36,6 +38,17 @@ export class MinioService {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
         console.log(file);
+
+        // this.cacheManager.set(file.originalname, file.buffer);
+
+        const fileNameFlag = (file.originalname as string).split('$$');
+
+        if (fileNameFlag[1]) {
+            this.chunkCount = Number(fileNameFlag[1]);
+        } else {
+            this.chunkCount++;
+            console.log(`总共分了：${this.chunkCount}片`);
+        }
     }
 
     async save(createMinIODto: CreateMinIODto) {
