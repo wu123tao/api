@@ -8,8 +8,6 @@ import { transformInterceptor } from './common/interceptor/interceptor';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
-    console.log(process.env.APP_PORT);
-
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalFilters(new HttpExceptionFilter());
     app.useGlobalInterceptors(new transformInterceptor());
