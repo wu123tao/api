@@ -8,6 +8,8 @@ import { transformInterceptor } from './common/interceptor/interceptor';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
+    console.log(process.env.APP_PORT);
+
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalFilters(new HttpExceptionFilter());
     app.useGlobalInterceptors(new transformInterceptor());
@@ -26,6 +28,6 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);
 
-    await app.listen(3000);
+    await app.listen(process.env.APP_PORT);
 }
 bootstrap();

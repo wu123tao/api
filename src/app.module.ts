@@ -9,20 +9,22 @@ import { LabelValueModule } from './modules/label-value/label-value.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { MinioModule } from './modules/minio/minio.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
     imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRoot({
             type: 'mysql',
-            host: '127.0.0.1',
-            port: 3306,
-            username: 'root',
-            password: 'root',
-            database: 'test',
+            host: process.env.MYSQL_URL,
+            port: Number(process.env.MYSQL_PORT),
+            username: process.env.MYSQL_ACCOUNT,
+            password: process.env.MYSQL_PASSWORD,
+            database: process.env.MYSQL_DATA_BASE,
             entities: [join(__dirname, '**', '*.entity.{js,ts}')],
             synchronize: true,
             // 输出sql语句
-            logging: true,
+            // logging: true,
         }),
         UsersModule,
         RoleModule,

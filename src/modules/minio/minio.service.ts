@@ -4,14 +4,15 @@ import * as MinIO from 'minio';
 @Injectable()
 export class MinioService {
     private readonly minioClient: MinIO.Client;
+    private readonly bucket: string = process.env.MINIO_BUCKET;
 
     constructor() {
         this.minioClient = new MinIO.Client({
-            endPoint: '124.222.52.234',
-            port: 9000,
+            endPoint: process.env.SERVER_URL,
+            port: Number(process.env.MINIO_PORT),
             useSSL: false,
-            accessKey: '3EOJJkxgAzpTLugFNgBq',
-            secretKey: 'zMvk7uOikCWx7c46oOjUx1Gvy3KyvC6ZIHzWlgFi',
+            accessKey: process.env.MINIO_ACCESSKEY,
+            secretKey: process.env.MINIO_SECRETKEY,
         });
     }
 
@@ -21,22 +22,35 @@ export class MinioService {
         }
         console.log(file);
 
-        return this.initMinIO(file.originalname as string, file.buffer);
+        return this.uploadToMinIO(file.originalname as string, file.buffer);
     }
 
-    async initMinIO(objectName: string, data: Buffer) {
-        const isExistBucket = await this.bucketExist(this.minioClient, 'test');
+    chunkUpload(file) {
+        if (!file) {
+            throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
+        }
+        console.log(file);
+    }
+
+    async uploadToMinIO(objectName: string, data: Buffer) {
+        const isExistBucket = await this.bucketExist(
+            this.minioClient,
+            this.bucket,
+        );
         if (!isExistBucket) {
-            await this.createBucket(this.minioClient, 'test');
+            await this.createBucket(this.minioClient, this.bucket);
         }
 
         // 文件上传
-        const res = await this.minioClient.putObject('test', objectName, data);
+        const res = await this.minioClient.putObject(
+            this.bucket,
+            objectName,
+            data,
+        );
         if (!res.etag) {
             throw new HttpException('上传失败', HttpStatus.BAD_REQUEST);
         }
-
-        return `http://124.222.52.234:9000/test/${objectName}`;
+        return `${process.env.MINIO_URL}/${objectName}`;
     }
 
     /**
