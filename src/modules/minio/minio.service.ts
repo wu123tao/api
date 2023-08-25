@@ -1,12 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as MinIO from 'minio';
+import { CreateMinIODto } from './dto/create-minio.dto';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class MinioService {
     private readonly minioClient: MinIO.Client;
     private readonly bucket: string = process.env.MINIO_BUCKET;
 
-    constructor() {
+    constructor(
+        @Inject(CACHE_MANAGER)
+        private cacheManager: Cache,
+    ) {
         this.minioClient = new MinIO.Client({
             endPoint: process.env.SERVER_URL,
             port: Number(process.env.MINIO_PORT),
@@ -30,6 +36,20 @@ export class MinioService {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
         console.log(file);
+    }
+
+    async save(createMinIODto: CreateMinIODto) {
+        console.log(createMinIODto);
+        const res = await this.cacheManager.set(
+            'roleCode',
+            createMinIODto.roleCode,
+        );
+        console.log(res, '设置缓存');
+    }
+
+    async getCache() {
+        const res = await this.cacheManager.get('roleCode');
+        console.log('获取缓存', res);
     }
 
     async uploadToMinIO(objectName: string, data: Buffer) {
