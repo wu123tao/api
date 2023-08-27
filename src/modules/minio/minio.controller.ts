@@ -53,8 +53,15 @@ export class MinioController {
             },
         },
     })
-    chunkUpload(@UploadedFile() file) {
-        return this.minioService.chunkUpload(file);
+    chunkUpload(@UploadedFile() file: Express.Multer.File, @Body() body) {
+        return this.minioService.chunkUpload(file, body);
+    }
+
+    @Post('mergeFile')
+    @ApiOperation({ summary: '合并文件' })
+    @OKResponse()
+    mergeFile(@Body() fileInfo) {
+        return this.minioService.mergeFile(fileInfo);
     }
 
     @Post('save')

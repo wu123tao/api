@@ -3,18 +3,18 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as MinIO from 'minio';
 import { CreateMinIODto } from './dto/create-minio.dto';
 import { Cache } from 'cache-manager';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class MinioService {
     private readonly minioClient: MinIO.Client;
     private readonly bucket: string = process.env.MINIO_BUCKET;
-    private chunkCount: number = 0;
 
     constructor(
         @Inject(CACHE_MANAGER)
         private cacheManager: Cache,
     ) {
-        this.chunkCount = 0;
         this.minioClient = new MinIO.Client({
             endPoint: process.env.SERVER_URL,
             port: Number(process.env.MINIO_PORT),
@@ -33,22 +33,102 @@ export class MinioService {
         return this.uploadToMinIO(file.originalname as string, file.buffer);
     }
 
-    chunkUpload(file) {
+    chunkUpload(file: Express.Multer.File, body) {
         if (!file) {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
-        console.log(file);
+        console.log(body);
 
-        // this.cacheManager.set(file.originalname, file.buffer);
+        const chunkFilePath = path.join(
+            __dirname,
+            '../../..',
+            `uploads/chunk/${body.uuid}`,
+        );
 
-        const fileNameFlag = (file.originalname as string).split('$$');
-
-        if (fileNameFlag[1]) {
-            this.chunkCount = Number(fileNameFlag[1]);
-        } else {
-            this.chunkCount++;
-            console.log(`总共分了：${this.chunkCount}片`);
+        if (!fs.existsSync(chunkFilePath)) {
+            fs.mkdirSync(chunkFilePath, { recursive: true });
         }
+
+        fs.writeFileSync(`${chunkFilePath}/${body.fileName}`, file.buffer);
+    }
+
+    mergeFile(fileInfo) {
+        console.log(fileInfo);
+        const sourceFiles = path.join(
+            __dirname,
+            '../../..',
+            `uploads/chunk/${fileInfo.uuid}`,
+        );
+        console.log(sourceFiles);
+
+        const targetFile = path.join(
+            __dirname,
+            '../../..',
+            `uploads/${fileInfo.fileName}`,
+        );
+        this.mergeChunkFile(sourceFiles, targetFile);
+
+        fs.rmSync(sourceFiles, { recursive: true, force: true });
+    }
+
+    /**
+     *
+     * @param sourceFile 源文件
+     * @param targetFile 目标文件
+     */
+    mergeChunkFile(sourceFiles, targetFile) {
+        const chunkFilesDir = sourceFiles;
+        console.log(chunkFilesDir);
+
+        const list = fs.readdirSync(chunkFilesDir);
+        console.log(list);
+
+        const filesList = list.map((name) => ({
+            name: name,
+            filePath: path.resolve(chunkFilesDir, name),
+        }));
+
+        console.log(filesList);
+
+        const fileWriteStream = fs.createWriteStream(targetFile);
+
+        this.chunkStreamMergeProcess(filesList, fileWriteStream, sourceFiles);
+    }
+
+    /**
+     *
+     * @param fileList 文件数据
+     * @param fileWriteStream 最终的写入文件
+     * @param sourceFiles 文件路径
+     */
+    chunkStreamMergeProcess(
+        fileList: any[],
+        fileWriteStream: fs.WriteStream,
+        sourceFiles,
+    ) {
+        if (!fileList.length) {
+            fileWriteStream.end('完成了');
+            return;
+        }
+
+        // 取第一个数据
+        const data = fileList.shift();
+        const { filePath: chunkFilePath } = data;
+
+        // 读取文件
+        const currentReadStream = fs.createReadStream(chunkFilePath);
+
+        // 把结果往最终的生成文件上进行拼接
+        currentReadStream.pipe(fileWriteStream, { end: false });
+
+        currentReadStream.on('end', () => {
+            // 拼接完之后进入下一次循环
+            this.chunkStreamMergeProcess(
+                fileList,
+                fileWriteStream,
+                sourceFiles,
+            );
+        });
     }
 
     async save(createMinIODto: CreateMinIODto) {
