@@ -18,7 +18,7 @@ async function bootstrap() {
      * 生成swagger文档
      */
     const config = new DocumentBuilder()
-        // .addBearerAuth()
+        .addBearerAuth()
         .setTitle('DEMO Nest API')
         .setDescription('第一个nestjs API项目')
         .setVersion('3.0')
@@ -26,6 +26,6 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);
 
-    await app.listen(3000);
+    await app.listen(process.env.APP_PORT);
 }
 bootstrap();
