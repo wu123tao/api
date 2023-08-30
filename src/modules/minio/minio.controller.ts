@@ -4,13 +4,11 @@ import {
     UseInterceptors,
     UploadedFile,
     Body,
-    Get,
 } from '@nestjs/common';
 import { MinioService } from './minio.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OKResponse } from 'src/common/decorators/response.decorator';
-import { CreateMinIODto } from './dto/create-minio.dto';
 
 @ApiTags('文件管理')
 @Controller('files')
@@ -64,17 +62,17 @@ export class MinioController {
         return this.minioService.mergeFile(fileInfo);
     }
 
-    @Post('save')
-    @ApiOperation({ summary: '测试redis(添加redis缓存)' })
-    @OKResponse()
-    save(@Body() createMinIODto: CreateMinIODto) {
-        return this.minioService.save(createMinIODto);
-    }
+    // @Post('save')
+    // @ApiOperation({ summary: '测试redis(添加redis缓存)' })
+    // @OKResponse()
+    // save(@Body() createMinIODto: CreateMinIODto) {
+    //     return this.minioService.save(createMinIODto);
+    // }
 
-    @Get('save')
-    @ApiOperation({ summary: '测试redis(获取redis缓存)' })
-    @OKResponse()
-    getCache() {
-        return this.minioService.getCache();
-    }
+    // @Get('save')
+    // @ApiOperation({ summary: '测试redis(获取redis缓存)' })
+    // @OKResponse()
+    // getCache() {
+    //     return this.minioService.getCache();
+    // }
 }
