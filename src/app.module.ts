@@ -5,9 +5,6 @@ import { UsersModule } from './modules/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { RoleModule } from './modules/role/role.module';
-import { LabelValueModule } from './modules/label-value/label-value.module';
-import { OrganizationModule } from './modules/organization/organization.module';
-import { DepartmentModule } from './modules/department/department.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { ConfigModule } from '@nestjs/config';
 
@@ -28,9 +25,6 @@ import { ConfigModule } from '@nestjs/config';
         }),
         UsersModule,
         RoleModule,
-        LabelValueModule,
-        OrganizationModule,
-        DepartmentModule,
         MinioModule,
     ],
     controllers: [AppController],
