@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BaseSearchDto } from 'src/common/dto/search-params.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Role } from 'src/modules/role/entities/role.entity';
+import { ToolsService } from '../tools/tools.service';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,7 @@ export class UsersService {
         @InjectRepository(User)
         private usersRepository: Repository<User>,
         private readonly jwtService: JwtService,
+        private readonly toolsService: ToolsService,
     ) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -196,5 +198,9 @@ export class UsersService {
         const token = this.createToken(validateAccount);
 
         return { ...omit(validateAccount, 'password'), token };
+    }
+
+    async sendEmail() {
+        return await this.toolsService.sendEmail();
     }
 }

@@ -74,4 +74,11 @@ export class UsersController {
     login(@Body() loginDto: LoginDto) {
         return this.usersService.login(loginDto);
     }
+
+    @Post('sendEmail')
+    @ApiOperation({ summary: '发送邮件' })
+    @OKResponseData(LoginVo)
+    sendEmail() {
+        return this.usersService.sendEmail();
+    }
 }
