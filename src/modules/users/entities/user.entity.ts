@@ -16,7 +16,7 @@ export class User extends Base {
         name: 'password',
         comment: '密码',
         nullable: true,
-        select: false,
+        // select: false,
     })
     password: string;
 
