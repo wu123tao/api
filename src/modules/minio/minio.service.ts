@@ -4,7 +4,6 @@ import * as MinIO from 'minio';
 import { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Stream } from 'stream';
 
 @Injectable()
 export class MinioService {
@@ -33,100 +32,65 @@ export class MinioService {
         return this.uploadToMinIO(file.originalname as string, file.buffer);
     }
 
-    async chunkUpload(file: Express.Multer.File, body) {
+    chunkUploadToLocal(file: Express.Multer.File, body) {
         if (!file) {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
+        // console.log(body);
 
-        await this.uploadToMinIO(body.fileName, file.buffer, body.uuid);
+        const chunkFilePath = path.join(
+            __dirname,
+            '../../..',
+            `uploads/chunk/${body.uuid}`,
+        );
+
+        if (!fs.existsSync(chunkFilePath)) {
+            fs.mkdirSync(chunkFilePath, { recursive: true });
+        }
+
+        fs.writeFileSync(`${chunkFilePath}/${body.fileName}`, file.buffer);
     }
 
-    async mergeFile(fileInfo) {
-        console.log(fileInfo);
+    async mergeFileToLocal(fileInfo) {
+        const sourceFiles = path.join(
+            __dirname,
+            '../../..',
+            `uploads/chunk/${fileInfo.uuid}`,
+        );
+        // console.log(sourceFiles);
 
-        const res = await this.minioClient.listObjects(fileInfo.uuid, '', true);
-
-        console.log(res);
-
-        // minio 返回的是文件流，需要做下处理
-        const fileList = await this.readData(res);
-        console.log(fileList);
-        return fileList;
+        const targetFile = path.join(
+            __dirname,
+            '../../..',
+            `uploads/${fileInfo.fileName}`,
+        );
+        await this.mergeChunkFile(sourceFiles, targetFile, fileInfo.fileName);
     }
-    async readData(stream: Stream) {
-        return new Promise((resolve, reject) => {
-            const a = [];
-            stream
-                .on('data', (row) => {
-                    a.push(row);
-                })
-                .on('end', () => {
-                    resolve(a);
-                })
-                .on('error', (error) => {
-                    reject(error);
-                });
-        });
-    }
-
-    // chunkUpload(file: Express.Multer.File, body) {
-    //     if (!file) {
-    //         throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
-    //     }
-    //     console.log(body);
-
-    //     const chunkFilePath = path.join(
-    //         __dirname,
-    //         '../../..',
-    //         `uploads/chunk/${body.uuid}`,
-    //     );
-
-    //     if (!fs.existsSync(chunkFilePath)) {
-    //         fs.mkdirSync(chunkFilePath, { recursive: true });
-    //     }
-
-    //     fs.writeFileSync(`${chunkFilePath}/${body.fileName}`, file.buffer);
-    // }
-
-    // mergeFile(fileInfo) {
-    //     console.log(fileInfo);
-    //     const sourceFiles = path.join(
-    //         __dirname,
-    //         '../../..',
-    //         `uploads/chunk/${fileInfo.uuid}`,
-    //     );
-    //     console.log(sourceFiles);
-
-    //     const targetFile = path.join(
-    //         __dirname,
-    //         '../../..',
-    //         `uploads/${fileInfo.fileName}`,
-    //     );
-    //     this.mergeChunkFile(sourceFiles, targetFile);
-    // }
 
     /**
      * 合并切片
      * @param sourceFile 源文件
      * @param targetFile 目标文件
      */
-    mergeChunkFile(sourceFiles, targetFile) {
+    async mergeChunkFile(sourceFiles, targetFile, fileName) {
         const chunkFilesDir = sourceFiles;
-        console.log(chunkFilesDir);
 
         const list = fs.readdirSync(chunkFilesDir);
-        console.log(list);
 
         const filesList = list.map((name) => ({
             name: name,
             filePath: path.resolve(chunkFilesDir, name),
         }));
 
-        console.log(filesList);
-
         const fileWriteStream = fs.createWriteStream(targetFile);
 
-        this.chunkStreamMergeProcess(filesList, fileWriteStream, sourceFiles);
+        await this.chunkStreamMergeProcess(
+            filesList,
+            fileWriteStream,
+            sourceFiles,
+            targetFile,
+            fileName,
+        );
     }
 
     /**
@@ -134,15 +98,24 @@ export class MinioService {
      * @param fileList 文件数据
      * @param fileWriteStream 最终的写入文件
      * @param sourceFiles 文件路径
+     * @param targetFile 文件路径
      */
-    chunkStreamMergeProcess(
+    async chunkStreamMergeProcess(
         fileList: any[],
         fileWriteStream: fs.WriteStream,
         sourceFiles,
+        targetFile,
+        fileName,
     ) {
         if (!fileList.length) {
             fileWriteStream.end('完成了');
             fs.rmSync(sourceFiles, { recursive: true, force: true });
+            console.log(targetFile);
+
+            const fileStream = fs.createReadStream(targetFile);
+            await this.minioClient.putObject(this.bucket, fileName, fileStream);
+
+            fs.rmSync(targetFile);
             return;
         }
 
@@ -162,6 +135,8 @@ export class MinioService {
                 fileList,
                 fileWriteStream,
                 sourceFiles,
+                targetFile,
+                fileName,
             );
         });
     }
@@ -178,10 +153,7 @@ export class MinioService {
         }
 
         // minio中是否有相同的文件
-        const fileInfo = await this.minioClient.statObject(
-            this.bucket,
-            objectName,
-        );
+        const fileInfo = await this.objectState(bucket, objectName);
         if (fileInfo && fileInfo.etag) {
             return `${process.env.MINIO_URL}/${objectName}`;
         }
@@ -211,4 +183,67 @@ export class MinioService {
         }
         return Promise.resolve(true);
     }
+
+    /**
+     * 判断文件是否存在
+     */
+    objectState(bucket, objectName) {
+        return new Promise<MinIO.BucketItemStat | false>(async (resolve) => {
+            try {
+                const statObject = await this.minioClient.statObject(
+                    bucket,
+                    objectName,
+                );
+                resolve(statObject);
+            } catch (error) {
+                resolve(false);
+            }
+        });
+    }
+
+    // /**
+    //  * 文件分片上传到minio
+    //  */
+    // async chunkUpload(file: Express.Multer.File, body) {
+    //     if (!file) {
+    //         throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
+    //     }
+
+    //     await this.uploadToMinIO(body.fileName, file.buffer, body.uuid);
+    // }
+
+    // /**
+    //  * 分片合并
+    //  */
+    // async mergeFile(fileInfo) {
+    //     console.log(fileInfo);
+
+    //     const bucketStream = await this.minioClient.listObjects(
+    //         fileInfo.uuid,
+    //         '',
+    //         true,
+    //     );
+    //     console.log(bucketStream);
+
+    //     // minio 返回的是文件流，需要做下处理
+    //     const fileList = await this.readData(bucketStream);
+    //     console.log(fileList);
+    //     return fileList;
+    // }
+
+    // async readData(stream: Stream) {
+    //     return new Promise((resolve, reject) => {
+    //         const a = [];
+    //         stream
+    //             .on('data', (row) => {
+    //                 a.push(row);
+    //             })
+    //             .on('end', () => {
+    //                 resolve(a);
+    //             })
+    //             .on('error', (error) => {
+    //                 reject(error);
+    //             });
+    //     });
+    // }
 }
