@@ -161,7 +161,7 @@ export class MinioService {
         // minio中是否有相同的文件
         const fileInfo = await this.objectState(bucket, objectName);
         if (fileInfo && fileInfo.etag) {
-            return `${this.MinioInfo}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
+            return `${this.MinioInfo.endPoint}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
         }
 
         // 文件上传
@@ -169,7 +169,7 @@ export class MinioService {
         if (!res.etag) {
             throw new HttpException('上传失败', HttpStatus.BAD_REQUEST);
         }
-        return `${this.MinioInfo}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
+        return `${this.MinioInfo.endPoint}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
     }
 
     /**
