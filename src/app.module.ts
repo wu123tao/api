@@ -6,45 +6,42 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
 import { RoleModule } from './modules/role/role.module';
 import { MinioModule } from './modules/minio/minio.module';
-import { ConfigModule } from '@nestjs/config';
 import { ToolsModule } from './modules/tools/tools.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { ConfigService } from '@nestjs/config';
+import { VmpConfigModule } from './config/config.module';
+import { EmailConfig, envConfigVo } from './config/config.interface';
 
 @Module({
     imports: [
-        // .env配置文件
-        ConfigModule.forRoot({ isGlobal: true }),
-        // 数据库配置
-        TypeOrmModule.forRoot({
-            type: 'mysql',
-            host: process.env.MYSQL_URL,
-            port: Number(process.env.MYSQL_PORT),
-            username: process.env.MYSQL_ACCOUNT,
-            password: process.env.MYSQL_PASSWORD,
-            database: process.env.MYSQL_DATA_BASE,
-            entities: [path.join(__dirname, '**', '*.entity.{js,ts}')],
-            synchronize: true,
-            // 输出sql语句
-            // logging: true,
+        VmpConfigModule,
+        TypeOrmModule.forRootAsync({
+            useFactory: (config: ConfigService<envConfigVo>) => ({
+                ...config.get('mysqlConfig'),
+                entities: [path.join(__dirname, '**', '*.entity.{js,ts}')],
+            }),
+            inject: [ConfigService],
         }),
         // 邮件服务
-        MailerModule.forRoot({
-            transport: {
-                host: process.env.EMAIL_HOST,
-                port: Number(process.env.EMAIL_PORT),
-                auth: {
-                    user: process.env.EMAIL_AUTH,
-                    pass: process.env.EMAIL_PASS,
-                },
+        MailerModule.forRootAsync({
+            useFactory: (config: ConfigService<envConfigVo>) => {
+                const emailConfig = config.get('emailConfig') as EmailConfig;
+                return {
+                    ...config.get('emailConfig'),
+                    defaults: {
+                        from: `测试邮件<${emailConfig.transport.auth.user}>`,
+                    },
+                    template: {
+                        dir: path.join(
+                            process.cwd(),
+                            'src/modules/tools/template',
+                        ),
+                        adapter: new EjsAdapter(),
+                    },
+                };
             },
-            defaults: {
-                from: `测试邮件<${process.env.EMAIL_AUTH}>`,
-            },
-            template: {
-                dir: path.join(process.cwd(), 'src/modules/tools/template'),
-                adapter: new EjsAdapter(),
-            },
+            inject: [ConfigService],
         }),
         UsersModule,
         RoleModule,

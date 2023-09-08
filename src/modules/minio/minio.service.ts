@@ -4,23 +4,29 @@ import * as MinIO from 'minio';
 import { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
+import { MinioConfig, envConfigVo } from 'src/config/config.interface';
 
 @Injectable()
 export class MinioService {
     private readonly minioClient: MinIO.Client;
-    private readonly bucket: string = process.env.MINIO_BUCKET;
+    private readonly bucket: string;
+    private readonly MinioInfo: MinioConfig;
 
     constructor(
         @Inject(CACHE_MANAGER)
         private cacheManager: Cache,
+        private configService: ConfigService<envConfigVo>,
     ) {
-        this.minioClient = new MinIO.Client({
-            endPoint: process.env.SERVER_URL,
-            port: Number(process.env.MINIO_PORT),
-            useSSL: false,
-            accessKey: process.env.MINIO_ACCESSKEY,
-            secretKey: process.env.MINIO_SECRETKEY,
-        });
+        const minioConfig = this.configService.get(
+            'minioConfig',
+        ) as MinioConfig;
+        this.MinioInfo = { ...minioConfig };
+        this.bucket = minioConfig.bucket;
+
+        console.log(minioConfig, '----------');
+
+        this.minioClient = new MinIO.Client(minioConfig);
     }
 
     upload(file) {
@@ -155,7 +161,7 @@ export class MinioService {
         // minio中是否有相同的文件
         const fileInfo = await this.objectState(bucket, objectName);
         if (fileInfo && fileInfo.etag) {
-            return `${process.env.MINIO_URL}/${objectName}`;
+            return `${this.MinioInfo}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
         }
 
         // 文件上传
@@ -163,7 +169,7 @@ export class MinioService {
         if (!res.etag) {
             throw new HttpException('上传失败', HttpStatus.BAD_REQUEST);
         }
-        return `${process.env.MINIO_URL}/${objectName}`;
+        return `${this.MinioInfo}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
     }
 
     /**
