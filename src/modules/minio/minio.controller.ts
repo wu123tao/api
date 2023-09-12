@@ -4,6 +4,7 @@ import {
     UseInterceptors,
     UploadedFile,
     Body,
+    Get,
 } from '@nestjs/common';
 import { MinioService } from './minio.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -14,6 +15,12 @@ import { OKResponse } from 'src/common/decorators/response.decorator';
 @Controller('files')
 export class MinioController {
     constructor(private readonly minioService: MinioService) {}
+
+    @ApiOperation({ summary: '文件列表' })
+    @Get('upload')
+    fileList() {
+        return this.minioService.fileList();
+    }
 
     @ApiOperation({ summary: '文件上传' })
     @Post('upload')
@@ -31,8 +38,8 @@ export class MinioController {
             },
         },
     })
-    upload(@UploadedFile() file) {
-        return this.minioService.upload(file);
+    upload(@UploadedFile() file: Express.Multer.File) {
+        return this.minioService.singleUpload(file);
     }
 
     // @ApiOperation({ summary: '文件切片上传' })

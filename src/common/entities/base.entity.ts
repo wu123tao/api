@@ -13,19 +13,21 @@ export class Base {
     remark: string;
 
     @CreateDateColumn({
+        type: 'timestamp',
         name: 'add_time',
         comment: '添加时间',
         nullable: true,
-        select: false,
+        // select: false,
     })
-    addTime: Date;
+    addTime: string;
 
     @UpdateDateColumn({
+        type: 'timestamp',
         name: 'edit_time',
         comment: '编辑时间',
         nullable: true,
         update: false,
-        select: false,
+        // select: false,
     })
-    editTime: Date;
+    editTime: string;
 }

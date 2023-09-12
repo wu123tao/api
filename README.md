@@ -22,7 +22,7 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## jwt + 邮件服务 + 文件上传 + 文件分片上传
+## jwt + 邮件服务 + 文件上传 + 文件分片上传 + nacos配置中心
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.

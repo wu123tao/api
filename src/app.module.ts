@@ -20,6 +20,7 @@ import { EmailConfig, envConfigVo } from './config/config.interface';
             useFactory: (config: ConfigService<envConfigVo>) => ({
                 ...config.get('mysqlConfig'),
                 entities: [path.join(__dirname, '**', '*.entity.{js,ts}')],
+                dateStrings: true,
             }),
             inject: [ConfigService],
         }),
