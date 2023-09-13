@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigService } from '@nestjs/config';
 import { MinioConfig, envConfigVo } from 'src/config/config.interface';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { FileEntity } from './entities/file.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -39,9 +39,20 @@ export class MinioService {
 
     async fileList() {
         const fileList = await this.fileRepository.find();
-        // console.log(fileList);
-
         return fileList;
+    }
+
+    async deleteFile({ ids }: { ids: string[] }) {
+        const list = await this.fileRepository.find({ where: { id: In(ids) } });
+        if (!list.length) {
+            return;
+        }
+
+        const listIds = list.map((item) => item.id);
+        await this.fileRepository.delete(listIds);
+
+        const fileNames = list.map((item) => item.fileName);
+        await this.minioClient.removeObjects(this.bucket, fileNames);
     }
 
     async singleUpload(file: Express.Multer.File) {
@@ -152,10 +163,33 @@ export class MinioService {
         if (!fileList.length) {
             fileWriteStream.end('完成了');
             fs.rmSync(sourceFiles, { recursive: true, force: true });
-            console.log(targetFile);
 
             const fileStream = fs.createReadStream(targetFile);
-            await this.minioClient.putObject(this.bucket, fileName, fileStream);
+
+            const fileUrl = await this.uploadToMinIO(
+                fileName,
+                fileStream,
+                this.bucket,
+            );
+
+            const statObject = await this.minioClient.statObject(
+                this.bucket,
+                fileName,
+            );
+
+            const fileInDataBaseInfo = await this.fileRepository.findOneBy({
+                etag: statObject.etag,
+            });
+            if (fileInDataBaseInfo) {
+                return fileInDataBaseInfo.url;
+            }
+
+            await this.fileRepository.save({
+                fileName,
+                fileSize: statObject.size,
+                url: fileUrl,
+                etag: statObject.etag,
+            });
 
             fs.rmSync(targetFile);
             return;
@@ -186,7 +220,7 @@ export class MinioService {
     // 文件传统上传
     async uploadToMinIO(
         objectName: string,
-        data: Buffer,
+        data: Buffer | fs.ReadStream,
         bucket: string = this.bucket,
     ) {
         console.log(objectName);
@@ -197,17 +231,11 @@ export class MinioService {
         }
 
         // minio中是否有相同的文件
-        const fileInMinioInfo = await this.objectState(bucket, objectName);
-        // 数据库里是否有与minio相同的文件
-        const fileInDataBase = await this.fileRepository.findOneBy({
-            etag: fileInMinioInfo && fileInMinioInfo.etag,
-        });
-        if (fileInMinioInfo && fileInDataBase) {
-            if (fileInDataBase && fileInDataBase.etag) {
-                return fileInDataBase.url;
-            }
-        }
+        const objectState = await this.objectState(bucket, objectName);
 
+        if (objectState) {
+            return `${this.baseFileUrl}${objectName}`;
+        }
         // 文件上传
         const res = await this.minioClient.putObject(bucket, objectName, data);
         if (!res.etag) {

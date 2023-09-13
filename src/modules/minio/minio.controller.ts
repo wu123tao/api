@@ -9,7 +9,12 @@ import {
 import { MinioService } from './minio.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { OKResponse } from 'src/common/decorators/response.decorator';
+import { DeleteFileDto } from './dto/file.dto';
+import {
+    OKResponse,
+    OKResponseArr,
+} from '../../common/decorators/response.decorator';
+import { FileVo } from './vo/file.vo';
 
 @ApiTags('文件管理')
 @Controller('files')
@@ -17,9 +22,17 @@ export class MinioController {
     constructor(private readonly minioService: MinioService) {}
 
     @ApiOperation({ summary: '文件列表' })
-    @Get('upload')
+    @Get('list')
+    @OKResponseArr(FileVo)
     fileList() {
         return this.minioService.fileList();
+    }
+
+    @ApiOperation({ summary: '删除文件' })
+    @Post('delete')
+    @OKResponse()
+    deleteFile(@Body() body: DeleteFileDto) {
+        return this.minioService.deleteFile(body);
     }
 
     @ApiOperation({ summary: '文件上传' })

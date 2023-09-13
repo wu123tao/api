@@ -10,6 +10,12 @@ export class FileVo {
     @ApiProperty({ description: '文件大小', example: '', required: true })
     fileSize: number;
 
+    @ApiProperty({ description: '文件路径', example: '', required: true })
+    url: string;
+
+    @ApiProperty({ description: '文件标识', example: '', required: true })
+    etag: string;
+
     @ApiProperty({ description: '添加时间', example: '', required: true })
     addTime: Date;
 
