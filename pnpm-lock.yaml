@@ -7,7 +7,7 @@ specifiers:
   '@nestjs/cache-manager': ^2.1.0
   '@nestjs/cli': ^10.1.17
   '@nestjs/common': ^10.2.5
-  '@nestjs/config': ^3.1.0
+  '@nestjs/config': ^3.1.1
   '@nestjs/core': ^10.2.5
   '@nestjs/jwt': ^10.1.1
   '@nestjs/passport': ^10.0.2
@@ -64,7 +64,7 @@ dependencies:
   '@nestjs-modules/mailer': 1.9.1_yeb4dkhr2ythsfroiw55h45o64
   '@nestjs/cache-manager': 2.1.0_e4775t5wni5kqxug3gs3xsjewy
   '@nestjs/common': 10.2.5_j3td4gnlgk75ora6o6suo62byy
-  '@nestjs/config': 3.1.0_3infzyxdfy5ogjlgysdffez4tm
+  '@nestjs/config': 3.1.1_3infzyxdfy5ogjlgysdffez4tm
   '@nestjs/core': 10.2.5_vwqu7ajot4ayxmc566shdsodx4
   '@nestjs/jwt': 10.1.1_@nestjs+common@10.2.5
   '@nestjs/passport': 10.0.2_m5skz63qbht5lhbasztzppmaay
@@ -1212,8 +1212,8 @@ packages:
       tslib: 2.6.2
       uid: 2.0.2
 
-  /@nestjs/config/3.1.0_3infzyxdfy5ogjlgysdffez4tm:
-    resolution: {integrity: sha512-yaAM30odymAD1d85QJreb0MXEu8AaHmTDl0q4jJTIKnjUnypjF1uO34/6ayYG2eY6jByBAtoRTxo8NCrlwBLUw==}
+  /@nestjs/config/3.1.1_3infzyxdfy5ogjlgysdffez4tm:
+    resolution: {integrity: sha512-qu5QlNiJdqQtOsnB6lx4JCXPQ96jkKUsOGd+JXfXwqJqZcOSAq6heNFg0opW4pq4J/VZoNwoo87TNnx9wthnqQ==}
     peerDependencies:
       '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0
       reflect-metadata: ^0.1.13

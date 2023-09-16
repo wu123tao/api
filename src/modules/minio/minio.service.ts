@@ -60,6 +60,10 @@ export class MinioService {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
 
+        file.originalname = Buffer.from(file.originalname, 'latin1').toString(
+            'utf8',
+        );
+
         const fileUrl = await this.uploadToMinIO(
             file.originalname as string,
             file.buffer,
@@ -90,6 +94,9 @@ export class MinioService {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
         // console.log(body);
+        file.originalname = Buffer.from(file.originalname, 'latin1').toString(
+            'utf8',
+        );
 
         const chunkFilePath = path.join(
             __dirname,
