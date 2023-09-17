@@ -4,6 +4,9 @@ import { MinioController } from './minio.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { FileEntity } from './entities/file.entity';
+
 @Module({
     imports: [
         CacheModule.register<RedisClientOptions>({
@@ -15,6 +18,7 @@ import { redisStore } from 'cache-manager-redis-yet';
             password: 'root',
             ttl: 0,
         }),
+        TypeOrmModule.forFeature([FileEntity]),
     ],
     controllers: [MinioController],
     providers: [MinioService],

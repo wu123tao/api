@@ -6,36 +6,87 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigService } from '@nestjs/config';
 import { MinioConfig, envConfigVo } from 'src/config/config.interface';
+import { In, Repository } from 'typeorm';
+import { FileEntity } from './entities/file.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class MinioService {
     private readonly minioClient: MinIO.Client;
     private readonly bucket: string;
-    private readonly MinioInfo: MinioConfig;
+    private readonly baseFileUrl: string;
 
     constructor(
         @Inject(CACHE_MANAGER)
         private cacheManager: Cache,
+        @InjectRepository(FileEntity)
+        private fileRepository: Repository<FileEntity>,
         private configService: ConfigService<envConfigVo>,
     ) {
         const minioConfig = this.configService.get(
             'minioConfig',
         ) as MinioConfig;
-        this.MinioInfo = { ...minioConfig };
+        console.log(minioConfig, '----------');
+
+        const MinioInfo = { ...minioConfig } as MinioConfig;
+
         this.bucket = minioConfig.bucket;
 
-        console.log(minioConfig, '----------');
+        this.baseFileUrl = `http://${MinioInfo.endPoint}:${MinioInfo.port}/${MinioInfo.bucket}/`;
 
         this.minioClient = new MinIO.Client(minioConfig);
     }
 
-    upload(file) {
+    async fileList() {
+        const fileList = await this.fileRepository.find();
+        return fileList;
+    }
+
+    async deleteFile({ ids }: { ids: string[] }) {
+        const list = await this.fileRepository.find({ where: { id: In(ids) } });
+        if (!list.length) {
+            return;
+        }
+
+        const listIds = list.map((item) => item.id);
+        await this.fileRepository.delete(listIds);
+
+        const fileNames = list.map((item) => item.fileName);
+        await this.minioClient.removeObjects(this.bucket, fileNames);
+    }
+
+    async singleUpload(file: Express.Multer.File) {
         if (!file) {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
-        console.log(file);
 
-        return this.uploadToMinIO(file.originalname as string, file.buffer);
+        file.originalname = Buffer.from(file.originalname, 'latin1').toString(
+            'utf8',
+        );
+
+        const fileUrl = await this.uploadToMinIO(
+            file.originalname as string,
+            file.buffer,
+        );
+        const statObject = await this.minioClient.statObject(
+            this.bucket,
+            file.originalname,
+        );
+
+        const fileInDataBaseInfo = await this.fileRepository.findOneBy({
+            etag: statObject.etag,
+        });
+        if (fileInDataBaseInfo) {
+            return fileInDataBaseInfo.url;
+        }
+
+        const res = await this.fileRepository.save({
+            fileName: file.originalname,
+            fileSize: statObject.size,
+            url: fileUrl,
+            etag: statObject.etag,
+        });
+        return res.url;
     }
 
     chunkUploadToLocal(file: Express.Multer.File, body) {
@@ -43,6 +94,9 @@ export class MinioService {
             throw new HttpException('未选择文件', HttpStatus.BAD_REQUEST);
         }
         // console.log(body);
+        file.originalname = Buffer.from(file.originalname, 'latin1').toString(
+            'utf8',
+        );
 
         const chunkFilePath = path.join(
             __dirname,
@@ -116,10 +170,33 @@ export class MinioService {
         if (!fileList.length) {
             fileWriteStream.end('完成了');
             fs.rmSync(sourceFiles, { recursive: true, force: true });
-            console.log(targetFile);
 
             const fileStream = fs.createReadStream(targetFile);
-            await this.minioClient.putObject(this.bucket, fileName, fileStream);
+
+            const fileUrl = await this.uploadToMinIO(
+                fileName,
+                fileStream,
+                this.bucket,
+            );
+
+            const statObject = await this.minioClient.statObject(
+                this.bucket,
+                fileName,
+            );
+
+            const fileInDataBaseInfo = await this.fileRepository.findOneBy({
+                etag: statObject.etag,
+            });
+            if (fileInDataBaseInfo) {
+                return fileInDataBaseInfo.url;
+            }
+
+            await this.fileRepository.save({
+                fileName,
+                fileSize: statObject.size,
+                url: fileUrl,
+                etag: statObject.etag,
+            });
 
             fs.rmSync(targetFile);
             return;
@@ -150,26 +227,28 @@ export class MinioService {
     // 文件传统上传
     async uploadToMinIO(
         objectName: string,
-        data: Buffer,
+        data: Buffer | fs.ReadStream,
         bucket: string = this.bucket,
     ) {
+        console.log(objectName);
+
         const isExistBucket = await this.bucketExist(this.minioClient, bucket);
         if (!isExistBucket) {
             await this.minioClient.makeBucket(bucket);
         }
 
         // minio中是否有相同的文件
-        const fileInfo = await this.objectState(bucket, objectName);
-        if (fileInfo && fileInfo.etag) {
-            return `${this.MinioInfo.endPoint}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
-        }
+        const objectState = await this.objectState(bucket, objectName);
 
+        if (objectState) {
+            return `${this.baseFileUrl}${objectName}`;
+        }
         // 文件上传
         const res = await this.minioClient.putObject(bucket, objectName, data);
         if (!res.etag) {
             throw new HttpException('上传失败', HttpStatus.BAD_REQUEST);
         }
-        return `${this.MinioInfo.endPoint}:${this.MinioInfo.port}/${this.MinioInfo.bucket}/${objectName}`;
+        return `${this.baseFileUrl}${objectName}`;
     }
 
     /**
