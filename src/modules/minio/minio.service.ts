@@ -26,7 +26,6 @@ export class MinioService {
         const minioConfig = this.configService.get(
             'minioConfig',
         ) as MinioConfig;
-        console.log(minioConfig, '----------');
 
         const MinioInfo = { ...minioConfig } as MinioConfig;
 
