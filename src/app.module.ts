@@ -5,7 +5,6 @@ import { UsersModule } from './modules/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
 import { RoleModule } from './modules/role/role.module';
-import { MinioModule } from './modules/minio/minio.module';
 import { ToolsModule } from './modules/tools/tools.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
@@ -46,7 +45,6 @@ import { EmailConfig, envConfigVo } from './config/config.interface';
         }),
         UsersModule,
         RoleModule,
-        MinioModule,
         ToolsModule,
     ],
     controllers: [AppController],
