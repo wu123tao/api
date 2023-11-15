@@ -2,22 +2,22 @@ import { Global, Module } from '@nestjs/common';
 import { ToolsService } from './tools.service';
 import { ToolsController } from './tools.controller';
 import { CacheModule } from '@nestjs/cache-manager';
-import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileEntity } from './entities/file.entity';
+import { ConfigService } from '@nestjs/config';
+import { envConfigVo } from 'src/config/config.interface';
 
 @Global()
 @Module({
     imports: [
-        CacheModule.register<RedisClientOptions>({
-            store: redisStore,
-            socket: {
-                host: '124.222.52.234',
-                port: 6379,
-            },
-            password: 'root',
-            ttl: 0,
+        // 注册redis服务
+        CacheModule.registerAsync({
+            useFactory: (config: ConfigService<envConfigVo>) => ({
+                store: redisStore,
+                ...config.get('redisConfig'),
+            }),
+            inject: [ConfigService],
         }),
         TypeOrmModule.forFeature([FileEntity]),
     ],

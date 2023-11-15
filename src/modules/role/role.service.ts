@@ -7,12 +7,15 @@ import { Like, Repository } from 'typeorm';
 import { DeleteRoleDto } from './dto/delete-role.dto';
 import { RoleDto } from './dto/role.dto';
 import { BaseSearchDto } from 'src/common/dto/search-params.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class RoleService {
     constructor(
         @InjectRepository(Role)
         private roleRepository: Repository<Role>,
+
+        private readonly jwtService: JwtService,
     ) {}
 
     async create(createRoleDto: CreateRoleDto) {

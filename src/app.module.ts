@@ -14,7 +14,9 @@ import { EmailConfig, envConfigVo } from './config/config.interface';
 
 @Module({
     imports: [
+        // 注册nacos服务
         VmpConfigModule,
+        // 注册mysql服务
         TypeOrmModule.forRootAsync({
             useFactory: (config: ConfigService<envConfigVo>) => ({
                 ...config.get('mysqlConfig'),
@@ -23,7 +25,7 @@ import { EmailConfig, envConfigVo } from './config/config.interface';
             }),
             inject: [ConfigService],
         }),
-        // 邮件服务
+        // 注册邮件服务
         MailerModule.forRootAsync({
             useFactory: (config: ConfigService<envConfigVo>) => {
                 const emailConfig = config.get('emailConfig') as EmailConfig;
