@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Query,
+    UseGuards,
+    Request,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
@@ -15,7 +23,10 @@ import {
     PageResponse,
 } from 'src/common/decorators/response.decorator';
 import { LoginVo } from './vo/login.vo';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('用户管理')
 @Controller('users')
 export class UsersController {
@@ -73,5 +84,12 @@ export class UsersController {
     @OKResponseData(LoginVo)
     login(@Body() loginDto: LoginDto) {
         return this.usersService.login(loginDto);
+    }
+
+    @Get('getUserInfoByToken')
+    @ApiOperation({ summary: '根据token获取用户信息' })
+    getInfo(@Request() req) {
+        console.log(req.user, '用户信息');
+        return req.user;
     }
 }
