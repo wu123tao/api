@@ -5,7 +5,7 @@ export class NacosManager {
     private client: any;
     private DATA_ID = 'test';
     private GROUP = 'DEFAULT_GROUP';
-    private NAMESPACE = 'af26d348-654e-40a0-8710-c40e106f8308';
+    private NAMESPACE = 'd6a2e5a5-5511-4747-93a3-20fe4dc5e5f6';
     private SERVER_ADDR = `${process.env.SERVER_URL}:${process.env.NACOS_PORT}`;
 
     constructor() {
@@ -19,8 +19,8 @@ export class NacosManager {
             serverAddr: this.SERVER_ADDR,
             namespace: this.NAMESPACE,
             requestTimeout: 6000,
-            identityKey: 'example',
-            identityValue: 'example',
+            identityKey: 'test',
+            identityValue: 'test',
         });
     }
 
