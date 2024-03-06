@@ -25,13 +25,13 @@ import {
 import { LoginVo } from './vo/login.vo';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 @ApiTags('用户管理')
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('list')
     @ApiOperation({ summary: '用户列表' })
     @PageResponse(UserVo)
@@ -44,6 +44,8 @@ export class UsersController {
         return this.usersService.findList(searchParams, pageParams);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('save')
     @ApiOperation({ summary: '添加用户' })
     @OKResponse()
@@ -51,6 +53,8 @@ export class UsersController {
         return this.usersService.create(createUserDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('edit')
     @ApiOperation({ summary: '编辑用户' })
     @OKResponse()
@@ -58,6 +62,8 @@ export class UsersController {
         return this.usersService.update(updateRoleDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('delete')
     @ApiOperation({ summary: '删除用户' })
     @OKResponse()
@@ -65,6 +71,8 @@ export class UsersController {
         return this.usersService.remove(deleteRoleDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('detail')
     @ApiOperation({ summary: '用户详情' })
     @OKResponseData(UserVo)
@@ -72,6 +80,8 @@ export class UsersController {
         return this.usersService.findOne(id);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Post('resetPassword')
     @ApiOperation({ summary: '重置密码' })
     @OKResponse()
@@ -86,6 +96,8 @@ export class UsersController {
         return this.usersService.login(loginDto);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     @Get('getUserInfoByToken')
     @ApiOperation({ summary: '根据token获取用户信息' })
     getInfo(@Request() req) {
