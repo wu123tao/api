@@ -11,6 +11,7 @@ import { FileEntity } from './entities/file.entity';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Cache } from 'cache-manager';
+import { SocketGateway } from 'src/modules/socket/socket.gateway';
 
 @Injectable()
 export class ToolsService {
@@ -26,6 +27,8 @@ export class ToolsService {
 
         @InjectRepository(FileEntity)
         private fileRepository: Repository<FileEntity>,
+
+        private readonly socketGateway: SocketGateway,
 
         private configService: ConfigService<envConfigVo>,
     ) {
@@ -222,7 +225,7 @@ export class ToolsService {
                 url: fileUrl,
                 etag: statObject.etag,
             });
-
+            await this.socketGateway.count();
             fs.rmSync(targetFile);
             return;
         }

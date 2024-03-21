@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileEntity } from './entities/file.entity';
 import { ConfigService } from '@nestjs/config';
 import { envConfigVo } from 'src/config/config.interface';
+import { SocketModule } from 'src/modules/socket/socket.module';
 
 @Global()
 @Module({
@@ -20,6 +21,7 @@ import { envConfigVo } from 'src/config/config.interface';
             inject: [ConfigService],
         }),
         TypeOrmModule.forFeature([FileEntity]),
+        SocketModule,
     ],
     controllers: [ToolsController],
     providers: [ToolsService],

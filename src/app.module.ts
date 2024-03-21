@@ -11,6 +11,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { ConfigService } from '@nestjs/config';
 import { VmpConfigModule } from './config/config.module';
 import { EmailConfig, envConfigVo } from './config/config.interface';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import { EmailConfig, envConfigVo } from './config/config.interface';
         UsersModule,
         RoleModule,
         ToolsModule,
+        SocketModule,
     ],
     controllers: [AppController],
     providers: [AppService],
