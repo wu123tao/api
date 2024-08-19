@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 export class LoginDto {
-    @ApiProperty({ description: 'id', example: '', required: true })
+    @ApiProperty({ description: '账号', example: '', required: true })
+    @IsNotEmpty({ message: '账号不能为空' })
     account: string;
 
-    @ApiProperty({ description: '用户名', example: '', required: true })
+    @ApiProperty({ description: '密码', example: '', required: true })
+    @IsNotEmpty({ message: '密码不能为空' })
     password: string;
 }
 
