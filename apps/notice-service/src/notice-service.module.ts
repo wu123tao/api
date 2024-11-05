@@ -4,6 +4,7 @@ import { NoticeServiceService } from './notice-service.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
                 adapter: new EjsAdapter(),
             },
         }),
+        ScheduleModule.forRoot(),
     ],
     controllers: [NoticeServiceController],
     providers: [NoticeServiceService],
